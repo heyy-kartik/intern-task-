@@ -17,7 +17,7 @@ export async function GET() {
       include: { author: true },
     });
     return NextResponse.json(posts, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching posts:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
@@ -61,13 +61,13 @@ export async function POST(request: Request) {
         },
       });
     } catch (error: any) {
-      // Prisma unique constraint violation code is 'P2002'
+      
       if (error.code === 'P2002' && error.meta?.target?.includes('slug')) {
         // Append a unique hash to the slug
         const uniqueHash = Math.random().toString(36).substring(2, 8);
         slug = `${slug}-${uniqueHash}`;
 
-        let defaultUser = await prisma.user.findFirst();
+        const defaultUser = await prisma.user.findFirst();
 
         post = await prisma.post.create({
           data: {
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(post, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating post:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
